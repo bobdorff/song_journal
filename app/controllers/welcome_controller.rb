@@ -1,5 +1,5 @@
-class WelcomeController < ApplicationController 
+class WelcomeController < ApplicationController
   def index
-    render template: 'welcome'
+    render template: "welcome"
   end
 end

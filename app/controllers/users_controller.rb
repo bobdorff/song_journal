@@ -19,21 +19,24 @@ class UsersController < ApplicationController
     if @user && @user.authenticate(user_params[:password])
       session[:user_id] = @user.id
       redirect_to '/'
+    else
     end
   end
 
   def create
-    @user = User.new
+    @user = User.new(user_params)
 
     if @user.save
       session[:user_id] = @user.id
-      redirected_to '/'
+      redirect_to '/'
     else
       render template: 'users/new'
     end
   end
 
   def logout
+    session.delete(:user_id)
+    redirect_to "/"
   end
 
 
@@ -44,6 +47,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :first_name, :last_name, :username)
+    params.require(:user).permit(:email, :password, :password_confirmation, :first_name, :last_name, :username)
   end
 end

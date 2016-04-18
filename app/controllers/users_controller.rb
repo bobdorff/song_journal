@@ -8,7 +8,7 @@ class UsersController < ApplicationController
 
   def login
     if current_user
-      redirect_to '/'
+      redirect_to "/users/#{current_user.id}"
     else
       render template: "users/login"
     end
@@ -18,19 +18,20 @@ class UsersController < ApplicationController
     @user = User.find_by(email: user_params[:email])
     if @user && @user.authenticate(user_params[:password])
       session[:user_id] = @user.id
-      redirect_to '/'
+      redirect_to "/users/#{current_user.id}"
     else
     end
   end
 
   def create
-    @user = User.new(user_params)
-
-    if @user.save
-      session[:user_id] = @user.id
-      redirect_to '/'
-    else
-      render template: 'users/new'
+    if !current_user
+      @user = User.new(user_params)
+      if @user.save
+        session[:user_id] = @user.id
+        redirect_to "/users/#{current_user.id}"
+      else
+        render template: 'users/new'
+      end
     end
   end
 
@@ -39,11 +40,22 @@ class UsersController < ApplicationController
     redirect_to "/"
   end
 
+  def show
+    if current_user.id.to_s == params[:id]
+      render template: 'users/show'
+    else
+      redirect_to login_page_path 
+    end
+  end
+
 
   private
   def current_user
-    return nil if session[:user_id].nil?
-    User.find(session[:user_id])
+    if session[:user_id] == nil
+      nil
+    else
+      User.find(session[:user_id])
+    end
   end
 
   def user_params
